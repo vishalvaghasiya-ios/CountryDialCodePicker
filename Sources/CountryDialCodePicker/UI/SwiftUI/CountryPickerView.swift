@@ -14,24 +14,41 @@ struct CountryPickerView: View {
 
     var body: some View {
         NavigationView {
-            content
-                .navigationTitle(config.title)
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            onCancel?()
-                            dismiss()
+            Group {
+                if config.showSearch {
+                    content
+                        .navigationTitle(config.title)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Cancel") {
+                                    onCancel?()
+                                    dismiss()
+                                }
+                            }
                         }
-                    }
-                }
-                .if(config.showSearch) { view in
-                    view
-                        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search by name or code")
-                        .textInputAutocapitalization(.never)
+                        .searchable(
+                            text: $query,
+                            placement: SearchFieldPlacement.navigationBarDrawer(displayMode: .always),
+                            prompt: "Search by name or code"
+                        )
+                        .textInputAutocapitalization(TextInputAutocapitalization.never)
                         .autocorrectionDisabled()
                         .onChange(of: query) { _ in Task { await refresh() } }
+                } else {
+                    content
+                        .navigationTitle(config.title)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Cancel") {
+                                    onCancel?()
+                                    dismiss()
+                                }
+                            }
+                        }
                 }
+            }
         }
         .navigationViewStyle(.stack)
         .task { await refresh() }
