@@ -25,6 +25,13 @@ struct CountryPickerView: View {
                         }
                     }
                 }
+                .if(config.showSearch) { view in
+                    view
+                        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search by name or code")
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .onChange(of: query) { _ in Task { await refresh() } }
+                }
         }
         .navigationViewStyle(.stack)
         .task { await refresh() }
@@ -35,14 +42,6 @@ struct CountryPickerView: View {
         ScrollViewReader { proxy in
             ZStack(alignment: .trailing) {
                 List {
-                    if config.showSearch {
-                        Section {
-                            TextField("Search by name or code", text: $query)
-                                .textInputAutocapitalization(.never)
-                                .autocorrectionDisabled()
-                                .onChange(of: query) { _ in Task { await refresh() } }
-                        }
-                    }
                     ForEach(sections.indices, id: \.self) { index in
                         let section = sections[index]
                         Section(header: Text(section.key).id(section.key)) {
