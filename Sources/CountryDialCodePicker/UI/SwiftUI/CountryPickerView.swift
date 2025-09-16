@@ -11,6 +11,7 @@ struct CountryPickerView: View {
     let onCancel: (() -> Void)?
 
     @State private var indexLetters: [String] = []
+    @State private var keyboardHeight: CGFloat = 0
 
     var body: some View {
         NavigationView {
@@ -29,7 +30,6 @@ struct CountryPickerView: View {
                         }
                         .searchable(
                             text: $query,
-                            placement: SearchFieldPlacement.navigationBarDrawer(displayMode: .always),
                             prompt: "Search by name or code"
                         )
                         .textInputAutocapitalization(TextInputAutocapitalization.never)
@@ -52,6 +52,15 @@ struct CountryPickerView: View {
         }
         .navigationViewStyle(.stack)
         .task { await refresh() }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
+            guard let info = note.userInfo,
+                  let frame = info[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
+            else { return }
+            keyboardHeight = frame.height
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            keyboardHeight = 0
+        }
     }
 
     @ViewBuilder
@@ -74,6 +83,7 @@ struct CountryPickerView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
+                .padding(.bottom, keyboardHeight)
 
                 if config.showIndexBar, !indexLetters.isEmpty {
                     IndexBar(letters: indexLetters) { letter in
