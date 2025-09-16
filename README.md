@@ -206,5 +206,5 @@ Feel free to explore and customize `CountryDialCodePicker` to best fit your appâ
 
 ## ðŸ‘¤ Author
 
-**Vishal Vaghasiya**
+Vishal Vaghasiya  
 GitHub: [vishalvaghasiya-ios](https://github.com/vishalvaghasiya-ios)
