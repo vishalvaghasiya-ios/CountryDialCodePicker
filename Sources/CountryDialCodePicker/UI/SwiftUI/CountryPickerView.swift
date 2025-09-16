@@ -11,14 +11,6 @@ struct CountryPickerView: View {
     let onCancel: (() -> Void)?
 
     @State private var indexLetters: [String] = []
-    @State private var keyboardHeight: CGFloat = 0
-
-    private var bottomSafeAreaInset: CGFloat {
-        let scenes = UIApplication.shared.connectedScenes
-        let windowScene = scenes.first as? UIWindowScene
-        let keyWindow = windowScene?.windows.first { $0.isKeyWindow }
-        return keyWindow?.safeAreaInsets.bottom ?? 0
-    }
 
     var body: some View {
         NavigationView {
@@ -59,15 +51,6 @@ struct CountryPickerView: View {
         }
         .navigationViewStyle(.stack)
         .task { await refresh() }
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
-            guard let info = note.userInfo,
-                  let frame = info[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
-            else { return }
-            keyboardHeight = frame.height
-        }
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
-            keyboardHeight = 0
-        }
     }
 
     @ViewBuilder
@@ -91,9 +74,7 @@ struct CountryPickerView: View {
                         }
                     }
                     .listStyle(.insetGrouped)
-                    .safeAreaInset(edge: .bottom) {
-                        Color.clear.frame(height: max(0, keyboardHeight - bottomSafeAreaInset))
-                    }
+                    .ignoresSafeArea(.keyboard, edges: .bottom)
                 }
 
                 if config.showIndexBar, !indexLetters.isEmpty {
@@ -103,10 +84,8 @@ struct CountryPickerView: View {
                         }
                     }
                     .padding(.trailing, 6)
-                    .padding(.bottom, max(0, keyboardHeight - bottomSafeAreaInset))
                 }
             }
-            .animation(.easeInOut(duration: 0.25), value: keyboardHeight)
         }
     }
 
