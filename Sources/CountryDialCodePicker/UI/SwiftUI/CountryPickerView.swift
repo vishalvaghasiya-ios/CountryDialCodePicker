@@ -13,6 +13,13 @@ struct CountryPickerView: View {
     @State private var indexLetters: [String] = []
     @State private var keyboardHeight: CGFloat = 0
 
+    private var bottomSafeAreaInset: CGFloat {
+        let scenes = UIApplication.shared.connectedScenes
+        let windowScene = scenes.first as? UIWindowScene
+        let keyWindow = windowScene?.windows.first { $0.isKeyWindow }
+        return keyWindow?.safeAreaInsets.bottom ?? 0
+    }
+
     var body: some View {
         NavigationView {
             Group {
@@ -83,7 +90,7 @@ struct CountryPickerView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
-                .padding(.bottom, keyboardHeight)
+                .padding(.bottom, max(0, keyboardHeight - bottomSafeAreaInset))
 
                 if config.showIndexBar, !indexLetters.isEmpty {
                     IndexBar(letters: indexLetters) { letter in
@@ -92,8 +99,10 @@ struct CountryPickerView: View {
                         }
                     }
                     .padding(.trailing, 6)
+                    .padding(.bottom, max(0, keyboardHeight - bottomSafeAreaInset))
                 }
             }
+            .animation(.easeInOut(duration: 0.25), value: keyboardHeight)
         }
     }
 
