@@ -57,8 +57,8 @@ struct CountryPickerView: View {
     private var content: some View {
         ScrollViewReader { proxy in
             ZStack(alignment: .trailing) {
-                ScrollView {
-                    LazyVStack(alignment: .leading, pinnedViews: [.sectionHeaders]) {
+                GeometryReader { _ in
+                    List {
                         ForEach(sections.indices, id: \.self) { index in
                             let section = sections[index]
                             Section(header: Text(section.key).id(section.key)) {
@@ -73,6 +73,8 @@ struct CountryPickerView: View {
                             }
                         }
                     }
+                    .listStyle(.insetGrouped)
+                    .ignoresSafeArea(.keyboard, edges: .bottom)
                 }
 
                 if config.showIndexBar, !indexLetters.isEmpty {
