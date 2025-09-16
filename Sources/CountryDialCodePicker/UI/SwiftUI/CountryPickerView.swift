@@ -5,6 +5,7 @@ struct CountryPickerView: View {
     @State private var items: [Country] = []
     @State private var sections: [(key: String, items: [Country])] = []
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.isSearching) private var isSearching
 
     let config: CountryPickerConfig
     let onSelect: (CountrySelection) -> Void
@@ -14,40 +15,17 @@ struct CountryPickerView: View {
 
     var body: some View {
         NavigationView {
-            Group {
-                if config.showSearch {
-                    content
-                        .navigationTitle(config.title)
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Cancel") {
-                                    onCancel?()
-                                    dismiss()
-                                }
-                            }
+            content
+                .navigationTitle(config.title)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            onCancel?()
+                            dismiss()
                         }
-                        .searchable(
-                            text: $query,
-                            prompt: "Search by name or code"
-                        )
-                        .textInputAutocapitalization(TextInputAutocapitalization.never)
-                        .autocorrectionDisabled()
-                        .onChange(of: query) { _ in Task { await refresh() } }
-                } else {
-                    content
-                        .navigationTitle(config.title)
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Cancel") {
-                                    onCancel?()
-                                    dismiss()
-                                }
-                            }
-                        }
+                    }
                 }
-            }
         }
         .navigationViewStyle(.stack)
         .task { await refresh() }
@@ -57,25 +35,23 @@ struct CountryPickerView: View {
     private var content: some View {
         ScrollViewReader { proxy in
             ZStack(alignment: .trailing) {
-                GeometryReader { _ in
-                    List {
-                        ForEach(sections.indices, id: \.self) { index in
-                            let section = sections[index]
-                            Section(header: Text(section.key).id(section.key)) {
-                                ForEach(section.items) { country in
-                                    Button {
-                                        onSelect(.init(country: country))
-                                        dismiss()
-                                    } label: {
-                                        row(for: country)
-                                    }
+                List {
+                    ForEach(sections.indices, id: \.self) { index in
+                        let section = sections[index]
+                        Section(header: Text(section.key).id(section.key)) {
+                            ForEach(section.items) { country in
+                                Button {
+                                    onSelect(.init(country: country))
+                                    dismiss()
+                                } label: {
+                                    row(for: country)
                                 }
                             }
                         }
                     }
-                    .listStyle(.insetGrouped)
-                    .ignoresSafeArea(.keyboard, edges: .bottom)
                 }
+                .listStyle(.insetGrouped)
+                .ignoresSafeArea(.keyboard, edges: .bottom)
 
                 if config.showIndexBar, !indexLetters.isEmpty {
                     IndexBar(letters: indexLetters) { letter in
