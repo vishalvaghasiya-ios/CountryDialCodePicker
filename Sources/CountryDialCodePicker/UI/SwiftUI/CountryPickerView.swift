@@ -74,23 +74,27 @@ struct CountryPickerView: View {
     private var content: some View {
         ScrollViewReader { proxy in
             ZStack(alignment: .trailing) {
-                List {
-                    ForEach(sections.indices, id: \.self) { index in
-                        let section = sections[index]
-                        Section(header: Text(section.key).id(section.key)) {
-                            ForEach(section.items) { country in
-                                Button {
-                                    onSelect(.init(country: country))
-                                    dismiss()
-                                } label: {
-                                    row(for: country)
+                GeometryReader { _ in
+                    List {
+                        ForEach(sections.indices, id: \.self) { index in
+                            let section = sections[index]
+                            Section(header: Text(section.key).id(section.key)) {
+                                ForEach(section.items) { country in
+                                    Button {
+                                        onSelect(.init(country: country))
+                                        dismiss()
+                                    } label: {
+                                        row(for: country)
+                                    }
                                 }
                             }
                         }
                     }
+                    .listStyle(.insetGrouped)
+                    .safeAreaInset(edge: .bottom) {
+                        Color.clear.frame(height: max(0, keyboardHeight - bottomSafeAreaInset))
+                    }
                 }
-                .listStyle(.insetGrouped)
-                .padding(.bottom, max(0, keyboardHeight - bottomSafeAreaInset))
 
                 if config.showIndexBar, !indexLetters.isEmpty {
                     IndexBar(letters: indexLetters) { letter in
