@@ -10,6 +10,7 @@ struct CountryPickerView: View {
     let config: CountryPickerConfig
     let onSelect: (CountrySelection) -> Void
     let onCancel: (() -> Void)?
+    let selectedCountry: Country?
 
     @State private var indexLetters: [String] = []
 
@@ -96,6 +97,11 @@ struct CountryPickerView: View {
                 Spacer()
                 Text(country.dialCode)
                     .foregroundStyle(.secondary)
+            }
+            if country.id == selectedCountry?.id {
+                Spacer()
+                Image(systemName: "checkmark")
+                    .foregroundColor(.blue)
             }
         }
         .accessibilityElement(children: .combine)

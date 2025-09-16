@@ -32,6 +32,6 @@ public struct CountryPicker {
         onSelect: @escaping (CountrySelection) -> Void,
         onCancel: (() -> Void)? = nil
     ) -> some View {
-        CountryPickerView(config: config, onSelect: onSelect, onCancel: onCancel)
+        CountryPickerView(config: config, onSelect: onSelect, onCancel: onCancel, selectedCountry: nil)
     }
 }

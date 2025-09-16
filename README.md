@@ -38,18 +38,23 @@ CountryDialCodePickerView(title: {
 
 ## 📦 Installation
 
-You can add `CountryDialCodePicker` to your project using Swift Package Manager (SPM):
+You can add `CountryDialCodePicker` to your Xcode project using Swift Package Manager (SPM). Follow these beginner-friendly steps:
 
-1. In Xcode, go to **File > Add Packages...**  
-2. Enter the repository URL of `CountryDialCodePicker`:
+1. **Open your Xcode project** — Launch Xcode and open the project where you want to add the package.
+
+2. **Open the Swift Package Manager interface** — In the menu bar, click on **File > Add Packages...**. This will open a dialog to add a new package dependency.
+
+3. **Enter the package repository URL** — In the search bar, paste the following URL and press Enter:
 
    ```
    https://github.com/vishalvaghasiya-ios/CountryDialCodePicker.git
    ```
-3. Choose the version or branch you want to use.  
-4. Add the package to your project.  
 
-Once added, you can import the package in your Swift files:
+4. **Choose the version or branch** — Select the version you want to use (usually the latest release) or specify a branch if needed. Then click **Add Package**.
+
+5. **Add the package to your project target** — Xcode will ask which targets to add the package to. Select your app target and confirm.
+
+Once the package is added, you can start using it in your Swift files by importing the module:
 
 ```swift
 import CountryDialCodePicker
@@ -88,6 +93,91 @@ struct ContentView: View {
             }
         }
         .padding()
+    }
+}
+```
+
+### Passing a Previously Selected Country
+
+You can pass a previously selected country to the picker so it highlights that country when the user opens it again.
+
+#### SwiftUI Example
+
+```swift
+import SwiftUI
+import CountryDialCodePicker
+
+struct ContentView: View {
+    @State private var selectedCountry: CountryDialCode? = nil
+    @State private var isPickerPresented = false
+
+    var body: some View {
+        VStack {
+            if let country = selectedCountry {
+                Text("Selected: \(country.name) (\(country.dialCode))")
+            } else {
+                Text("No country selected")
+            }
+
+            Button("Select Country") {
+                isPickerPresented = true
+            }
+            .sheet(isPresented: $isPickerPresented) {
+                CountryDialCodePickerView(selectedCountry: selectedCountry) { country in
+                    selectedCountry = country
+                    isPickerPresented = false
+                }
+            }
+        }
+        .padding()
+    }
+}
+```
+
+#### UIKit Example
+
+You can also pass the previously selected country to the UIKit picker view controller to highlight it:
+
+```swift
+import UIKit
+import CountryDialCodePicker
+
+class MyViewController: UIViewController, CountryDialCodePickerDelegate {
+    var selectedCountry: CountryDialCode?
+
+    @IBAction func showPicker(_ sender: Any) {
+        let pickerVC = CountryDialCodePickerViewController(selectedCountry: selectedCountry)
+        pickerVC.delegate = self
+        pickerVC.modalPresentationStyle = .formSheet // or .pageSheet, .fullScreen, etc.
+        present(pickerVC, animated: true, completion: nil)
+    }
+
+    // MARK: - CountryDialCodePickerDelegate
+    func countryDialCodePicker(_ picker: CountryDialCodePickerViewController, didSelect country: CountryDialCode) {
+        selectedCountry = country
+        dismiss(animated: true, completion: nil)
+        // Update your UI here with selectedCountry
+    }
+}
+```
+
+Alternatively, using the closure-based initializer:
+
+```swift
+import UIKit
+import CountryDialCodePicker
+
+class MyViewController: UIViewController {
+    var selectedCountry: CountryDialCode?
+
+    @IBAction func showPicker(_ sender: Any) {
+        let pickerVC = CountryDialCodePickerViewController(selectedCountry: selectedCountry) { [weak self] country in
+            self?.selectedCountry = country
+            self?.dismiss(animated: true, completion: nil)
+            // Update your UI here with selectedCountry
+        }
+        pickerVC.modalPresentationStyle = .formSheet
+        present(pickerVC, animated: true, completion: nil)
     }
 }
 ```
@@ -203,6 +293,10 @@ The picker returns the selected country via a closure. The `CountryDialCode` mod
 - `code`: The ISO country code (e.g., "US")  
 
 Use this information to update your UI or perform actions based on the user's selection.
+
+### Highlighting Previously Selected Country
+
+You can pass a previously selected country to the picker so that it is highlighted when the picker is opened again. This helps provide context to users and improves the selection experience.
 
 ## 📝 Version 1.0.0
 
