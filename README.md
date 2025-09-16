@@ -41,7 +41,11 @@ CountryDialCodePickerView(title: {
 You can add `CountryDialCodePicker` to your project using Swift Package Manager (SPM):
 
 1. In Xcode, go to **File > Add Packages...**  
-2. Enter the repository URL of `CountryDialCodePicker`: `https://github.com/vishalvaghasiya-ios/CountryDialCodePicker.git`  
+2. Enter the repository URL of `CountryDialCodePicker`:
+
+   ```
+   https://github.com/vishalvaghasiya-ios/CountryDialCodePicker.git
+   ```
 3. Choose the version or branch you want to use.  
 4. Add the package to your project.  
 
